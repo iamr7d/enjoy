@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JOY — Artificial Viewer</title>
+<meta name="description" content="A closed-loop artificial observer that watches film through a foveated percept, and the dissociation between predicting gaze and producing it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@200;300;400;500;600&display=swap">
+<style>
+/* Dark, cinematic, instrument-like. Every visual on this page is generated from the project's
+   own data or drawn from its own equations: the iris is the acuity falloff the viewer actually
+   uses, and the layered stack is one real frame through the four real stages. Nothing is stock.
+   Amber is the eye and is the only chroma; everything else is light on black. */
+:root{
+  --black:#08090b; --deep:#0b0d10; --panel:#101318; --line:#1e232b; --line-2:#2a313b;
+  --white:#f2f4f7; --grey:#a8b0ba; --dim:#79828d; --faint:#535c67;
+  --eye:#e8a33c; --teal:#58c7bd; --rust:#d98a72;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--black); color:var(--white);
+  font-family:var(--sans); font-size:15px; line-height:1.68; font-weight:300;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit; text-decoration:none}
+.wrap{max-width:1240px; margin:0 auto; padding:0 40px}
+.eyebrow{
+  font-size:10.5px; letter-spacing:.30em; text-transform:uppercase; color:var(--faint);
+  font-weight:400; margin:0 0 20px;
+}
+
+/* ---------------- nav ---------------- */
+nav{
+  position:sticky; top:0; z-index:40; background:rgba(8,9,11,.86);
+  backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+}
+nav .wrap{display:flex; align-items:center; gap:26px; height:66px}
+.mark{font-size:19px; letter-spacing:.42em; font-weight:300; white-space:nowrap}
+.mark-sub{font-size:10px; letter-spacing:.26em; color:var(--dim); text-transform:uppercase; white-space:nowrap}
+nav .links{display:flex; gap:26px; margin:0 auto}
+nav .links a{
+  font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--dim);
+  padding:4px 0; border-bottom:1px solid transparent; transition:.16s;
+}
+nav .links a:hover,nav .links a.on{color:var(--white); border-bottom-color:var(--white)}
+.pill{
+  border:1px solid var(--line-2); border-radius:999px; padding:9px 20px;
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--white);
+  white-space:nowrap; transition:.16s;
+}
+.pill:hover{border-color:var(--eye); color:var(--eye)}
+
+/* ---------------- hero ---------------- */
+.hero{position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);
+            gap:50px; align-items:center; padding-top:64px; padding-bottom:34px}
+.word{font-size:clamp(52px,8.4vw,104px); letter-spacing:.16em; font-weight:200;
+      line-height:1; margin:0 0 14px}
+.word-sub{font-size:clamp(11px,1.5vw,15px); letter-spacing:.5em; color:var(--grey);
+          font-weight:300; margin:0 0 34px; text-transform:uppercase}
+h1{font-size:clamp(21px,2.7vw,31px); line-height:1.28; font-weight:300; margin:0 0 20px;
+   letter-spacing:-.2px; max-width:19ch}
+.hero .lede{color:var(--grey); max-width:46ch; margin:0 0 30px; font-size:15px; font-weight:300}
+.cta{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:46px}
+.btn{
+  display:inline-flex; align-items:center; gap:11px; border-radius:999px; padding:13px 26px;
+  font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; transition:.16s;
+  border:1px solid var(--line-2);
+}
+.btn.solid{background:var(--white); color:var(--black); border-color:var(--white); font-weight:500}
+.btn.solid:hover{background:var(--eye); border-color:var(--eye)}
+.btn.ghost:hover{border-color:var(--white)}
+.stats{display:grid; grid-template-columns:repeat(4,auto); gap:38px; justify-content:start}
+.stats .n{font-size:31px; font-weight:200; letter-spacing:-1px; line-height:1; margin:0 0 8px;
+          font-family:var(--mono)}
+.stats .l{font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--faint);
+          margin:0; line-height:1.4}
+.closer{position:absolute; right:40px; bottom:26px; text-align:right; font-size:9.5px;
+        letter-spacing:.24em; text-transform:uppercase; color:var(--faint); line-height:1.7}
+
+/* the iris */
+.iris-holder{position:relative}
+.iris-holder svg{width:100%; height:auto; display:block}
+.ann{font-family:var(--sans); font-size:10.5px; letter-spacing:.22em; fill:var(--grey);
+     text-transform:uppercase}
+.ann-num{font-family:var(--mono); font-size:8.5px; fill:var(--faint); letter-spacing:.06em}
+
+/* ---------------- sections ---------------- */
+section{padding:88px 0; border-bottom:1px solid var(--line)}
+section.alt{background:var(--deep)}
+h2{font-size:clamp(25px,3.2vw,36px); font-weight:300; letter-spacing:-.5px; margin:0 0 22px;
+   line-height:1.2}
+h3{font-size:16px; font-weight:500; margin:0 0 7px; letter-spacing:-.1px}
+p{margin:0 0 16px; color:var(--grey)}
+.rule{width:52px; height:1px; background:var(--line-2); margin:24px 0}
+.more{font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--teal);
+      display:inline-flex; gap:9px; align-items:center; border-bottom:1px solid transparent}
+.more:hover{border-bottom-color:var(--teal)}
+
+.split{display:grid; grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr); gap:60px;
+       align-items:center}
+.stack{position:relative}
+.stack img{width:100%; height:auto; display:block}
+.stack ol{list-style:none; margin:0; padding:0; position:absolute; inset:0; pointer-events:none}
+.stack li{
+  position:absolute; right:-4px; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--grey); white-space:nowrap; display:flex; align-items:center; gap:10px;
+}
+.stack li::before{content:""; width:34px; height:1px; background:var(--line-2); display:block}
+.stack li:nth-child(1){top:9%}
+.stack li:nth-child(2){top:34%}
+.stack li:nth-child(3){top:59%}
+.stack li:nth-child(4){top:85%}
+
+/* glance */
+.glance{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:34px;
+        margin-top:44px}
+.glance .ic{width:30px; height:30px; margin-bottom:16px; color:var(--white)}
+.glance p{font-size:13.5px; color:var(--dim); margin:0}
+
+/* results */
+.cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:26px;
+       margin-top:38px}
+.card{display:block; border:1px solid var(--line); border-radius:4px; overflow:hidden;
+      background:var(--panel); transition:.18s}
+.card:hover{border-color:var(--line-2); transform:translateY(-2px)}
+.card img{width:100%; height:190px; object-fit:contain; display:block;
+          background:#fff; padding:12px; border-bottom:1px solid var(--line)}
+/* Data figures are drawn on white. Cropping them with object-fit:cover shows a slice of a
+   chart, which is worse than useless; contain on a white plate shows the whole thing. */
+.card .body{padding:20px}
+.card p{font-size:13px; color:var(--dim); margin:0}
+.sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:20px;
+          flex-wrap:wrap}
+
+/* numbers table */
+table{border-collapse:collapse; width:100%; margin-top:26px; font-size:14px}
+th{font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--faint);
+   font-weight:400; text-align:left; padding:0 14px 12px 0; border-bottom:1px solid var(--line)}
+td{padding:13px 14px 13px 0; border-bottom:1px solid var(--line); color:var(--grey);
+   font-weight:300}
+td.n{font-family:var(--mono); text-align:right; color:var(--teal); white-space:nowrap;
+     font-variant-numeric:tabular-nums}
+td.n.bad{color:var(--rust)}
+td.v{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
+     white-space:nowrap}
+.tw{overflow-x:auto}
+
+footer{padding:52px 0 70px; color:var(--faint); font-size:12.5px}
+footer .wrap{display:flex; justify-content:space-between; gap:26px; flex-wrap:wrap}
+footer a{color:var(--dim)}
+footer a:hover{color:var(--white)}
+
+@media (max-width:980px){
+  .hero .wrap,.split{grid-template-columns:1fr; gap:44px}
+  .stats{grid-template-columns:repeat(2,auto); gap:28px 44px}
+  .closer{display:none}
+  nav .links{display:none}
+  .wrap{padding:0 24px}
+}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="mark">JOY</span>
+  <span class="mark-sub">Artificial Viewer</span>
+  <span class="links">
+    <a class="on" href="#top">Home</a>
+    <a href="#research">Research</a>
+    <a href="#data">Data</a>
+    <a href="#publications">Publications</a>
+    <a href="#about">About</a>
+  </span>
+  <a class="pill" href="viewer.html">Open the viewer</a>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div>
+    <p class="word">J O Y</p>
+    <p class="word-sub">Artificial Viewer</p>
+    <h1>From gaze prediction to closed-loop computational observation</h1>
+    <p class="lede">
+      A machine that watches film. It receives only a foveated view, weighs what stands out
+      against what a language model finds meaningful, selects its own fixation, and then sees the
+      world from wherever that choice left it.
+    </p>
+    <div class="cta">
+      <a class="btn solid" href="#research">Explore the research &nbsp;→</a>
+      <a class="btn ghost" href="viewer.html">Open the viewer &nbsp;▶</a>
+    </div>
+    <div class="stats">
+      <div><p class="n">7</p><p class="l">Experiments</p></div>
+      <div><p class="n">75</p><p class="l">Film clips</p></div>
+      <div><p class="n">223</p><p class="l">Human observers</p></div>
+      <div><p class="n">1</p><p class="l">Artificial viewer</p></div>
+    </div>
+  </div>
+
+  <div class="iris-holder">
+    <!-- The iris is the acuity function the viewer actually uses: rings at 1, 5, 10 and 20
+         degrees of eccentricity, fibres whose length and brightness fall off with the same
+         curve. It is a diagram of the instrument, not a photograph of an eye. -->
+    <svg viewBox="0 0 620 620" role="img" aria-label="Acuity falloff with eccentricity, annotated with the four stages of the loop">
+      <defs>
+        <radialGradient id="ir" cx="50%" cy="50%" r="50%">
+          <stop offset="18%" stop-color="#05070a"/>
+          <stop offset="42%" stop-color="#1a2432"/>
+          <stop offset="72%" stop-color="#2c3a4b"/>
+          <stop offset="100%" stop-color="#0a0d12"/>
+        </radialGradient>
+        <radialGradient id="gl" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#e8a33c" stop-opacity=".30"/>
+          <stop offset="55%" stop-color="#e8a33c" stop-opacity=".05"/>
+          <stop offset="100%" stop-color="#e8a33c" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="270" cy="310" r="238" fill="url(#gl)"/>
+      <circle cx="270" cy="310" r="196" fill="url(#ir)"/>
+      <g id="fibres" stroke="#7f9bb8" fill="none"></g>
+      <circle cx="270" cy="310" r="196" fill="none" stroke="#3b4a5c" stroke-width="1"/>
+      <circle cx="270" cy="310" r="62" fill="#04060a"/>
+      <circle cx="270" cy="310" r="62" fill="none" stroke="#e8a33c" stroke-opacity=".35" stroke-width="1"/>
+      <!-- eccentricity rings -->
+      <g fill="none" stroke="#e8a33c" stroke-opacity=".22" stroke-dasharray="2 5">
+        <circle cx="270" cy="310" r="96"/><circle cx="270" cy="310" r="136"/>
+        <circle cx="270" cy="310" r="176"/>
+      </g>
+      <g class="ann-num" text-anchor="middle">
+        <text x="270" y="208">5°</text><text x="270" y="168">10°</text><text x="270" y="128">20°</text>
+      </g>
+      <!-- fixation cross -->
+      <g stroke="#e8a33c" stroke-width="1.2">
+        <line x1="238" y1="310" x2="258" y2="310"/><line x1="282" y1="310" x2="302" y2="310"/>
+        <line x1="270" y1="278" x2="270" y2="298"/><line x1="270" y1="322" x2="270" y2="342"/>
+      </g>
+      <!-- the loop, annotated outward -->
+      <g stroke="#3b4a5c" stroke-width="1">
+        <path d="M420 150 H556"/><path d="M452 250 H556"/>
+        <path d="M452 370 H556"/><path d="M420 470 H556"/>
+      </g>
+      <g fill="#e8a33c">
+        <circle cx="420" cy="150" r="3"/><circle cx="452" cy="250" r="3"/>
+        <circle cx="452" cy="370" r="3"/><circle cx="420" cy="470" r="3"/>
+      </g>
+      <g class="ann">
+        <text x="566" y="154">Perceive</text><text x="566" y="254">Select</text>
+        <text x="566" y="374">Move</text><text x="566" y="474">Learn</text>
+      </g>
+    </svg>
+  </div>
+</div>
+<p class="closer">A closer look<br>at looking</p>
+</header>
+
+<section class="alt" id="research"><div class="wrap">
+  <p class="eyebrow">A different question</p>
+  <div class="split">
+    <div>
+      <h2>What happens when a model has to look for itself?</h2>
+      <p>
+        Most models predict human gaze: they are handed a frame a person reached, and scored on
+        where that person looked. They are never asked to survive their own mistakes.
+      </p>
+      <div class="rule"></div>
+      <p>
+        JOY is given the frame only through a foveated percept, computes its evidence on
+        <strong style="color:var(--white);font-weight:400">that percept</strong> and never on the
+        full image, arbitrates between competing cues, samples a fixation, and begins again from
+        wherever it landed. The four panels are one real frame through those four stages.
+      </p>
+      <a class="more" href="#numbers">Read the full story →</a>
+    </div>
+    <div class="stack">
+      <img src="hero_stack.png" alt="One frame through four stages: world, retinal input, computed density, next fixation">
+      <ol>
+        <li>World</li>
+        <li>Retinal input</li>
+        <li>Computational processing</li>
+        <li>Next fixation</li>
+      </ol>
+    </div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <p class="eyebrow">Research at a glance</p>
+  <h2 style="max-width:20ch">Four constraints, one loop</h2>
+  <div class="glance">
+    <div>
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/></svg>
+      <h3>Human-like vision</h3>
+      <p>Acuity falls with eccentricity, and both evidence models see only what survives it.</p>
+    </div>
+    <div>
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="18" r="2.4"/><circle cx="19" cy="18" r="2.4"/><path d="M10.4 6.8 6.6 15.6M13.6 6.8l3.8 8.8M7.4 18h9.2"/></svg>
+      <h3>Competing guidance</h3>
+      <p>Salience, semantics, oculomotor history and a centre bias, each with its own weight.</p>
+    </div>
+    <div>
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 12a9 9 0 1 1-3.2-6.9"/><path d="M21 4v5h-5"/></svg>
+      <h3>Closed-loop control</h3>
+      <p>It updates its own history from its own choices. No human fixation reaches inference.</p>
+    </div>
+    <div>
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 20V9M10 20V4M16 20v-7M22 20V11"/></svg>
+      <h3>Held-out evaluation</h3>
+      <p>Free film viewing and task-directed search, paired and bootstrapped, folds reported.</p>
+    </div>
+  </div>
+</div></section>
+
+<section class="alt" id="numbers"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <p class="eyebrow">Featured results</p>
+      <h2 style="max-width:22ch">A model got better at predicting gaze without getting better at looking</h2>
+    </div>
+  </div>
+  <div class="cards">
+    <a class="card" href="thesis.html">
+      <img src="figures/fig03_dissociation.png" alt="The same policy under two evaluations">
+      <div class="body">
+        <h3>Prediction versus observation</h3>
+        <p>+0.0099 bits as a predictor, positive in five of five folds. As an observer, a median
+           of −0.919 and three wins in eight clips.</p>
+      </div>
+    </a>
+    <a class="card" href="thesis.html">
+      <img src="figures/fig03b_weights.png" alt="The viewer's own scanpath against the audience">
+      <div class="body">
+        <h3>Where the weight actually goes</h3>
+        <p>A global weight set fitted for held-out likelihood gives the semantic map zero in
+           four of five folds, while per-frame fits give it 0.0475.</p>
+      </div>
+    </a>
+    <a class="card" href="thesis.html">
+      <img src="figures/fig10_behaviour.png" alt="Five behavioural dimensions against the audience">
+      <div class="body">
+        <h3>Temporal behaviour</h3>
+        <p>Fixations of 214 to 220 ms against a human 179, saccades of 2.4 to 4.7 degrees
+           against 1.44. The gap no semantic mechanism touched.</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="tw"><table>
+    <tr><th>What each mechanism bought</th><th style="text-align:right">bits per fixation</th><th>folds</th></tr>
+    <tr><td>Semantic map over no semantic map</td><td class="n">+0.0030</td><td class="v">4 of 5</td></tr>
+    <tr><td>Story state over no story state</td><td class="n">+0.0041</td><td class="v">5 of 5</td></tr>
+    <tr><td>Best arbitration policy over fixed weights</td><td class="n">+0.0099</td><td class="v">5 of 5</td></tr>
+    <tr><td>Real story state over the same state from another clip</td><td class="n">+0.0214</td><td class="v">5 of 5</td></tr>
+    <tr><td>Gaze generated from the semantic map alone</td><td class="n bad">−4.726</td><td class="v">excludes 0</td></tr>
+    <tr><td style="color:var(--white)">All the headroom there was</td><td class="n">+0.2108</td><td class="v">5 of 5</td></tr>
+  </table></div>
+</div></section>
+
+<section id="publications"><div class="wrap">
+  <p class="eyebrow">Publications</p>
+  <h2 style="max-width:18ch">The written work</h2>
+  <div class="cards" style="margin-top:30px">
+    <a class="card" href="thesis.html" style="background:var(--panel)">
+      <div class="body">
+        <p class="eyebrow" style="margin:0 0 12px">Element 1 · 60%</p>
+        <h3>Thesis</h3>
+        <p>Seven experiments, nine figures, every number drawn from a stored result file rather
+           than typed.</p>
+      </div>
+    </a>
+    <a class="card" href="proposal.html">
+      <div class="body">
+        <p class="eyebrow" style="margin:0 0 12px">Element 2 · 20%</p>
+        <h3>PhD proposal</h3>
+        <p>Four studies over 36 months, from motor dynamics to a dramatic-irony eye-tracking
+           study.</p>
+      </div>
+    </a>
+    <a class="card" href="presentation.html">
+      <div class="body">
+        <p class="eyebrow" style="margin:0 0 12px">Element 3 · 20%</p>
+        <h3>Presentation</h3>
+        <p>Twelve slides with the full spoken script and the questions it should expect.</p>
+      </div>
+    </a>
+  </div>
+</div></section>
+
+<section class="alt" id="data"><div class="wrap">
+  <p class="eyebrow">Data</p>
+  <h2 style="max-width:20ch">What it was measured on</h2>
+  <div class="tw"><table>
+    <tr><th>resource</th><th>detail</th></tr>
+    <tr><td style="color:var(--white)">Film corpus</td><td>DIEM · 75 clips, 73 videos, 4,492 sampled frames, 223 observers, 4,619,922 identified fixation samples</td></tr>
+    <tr><td style="color:var(--white)">Search corpus</td><td>COCO-Search18 · 7,697 held-out per-fixation examples over 313 images and all ten observers</td></tr>
+    <tr><td style="color:var(--white)">Validation</td><td>45 named required tests on the film dataset, 28 on the search dataset, all passing</td></tr>
+    <tr><td style="color:var(--white)">Grounding quality</td><td>0.6% refusals, median overlap 0.855 against the annotated target</td></tr>
+  </table></div>
+</div></section>
+
+<section id="about"><div class="wrap">
+  <p class="eyebrow">About</p>
+  <div class="split">
+    <div>
+      <h2 style="max-width:16ch">Where the evidence stops</h2>
+      <p>
+        A page that reports only what worked is not reporting a result. Adaptive arbitration is
+        constrained here, not refuted. Foveation was not shown to humanise the viewer. The
+        semantic map may be operating through high-level image structure rather than meaning.
+        Narrative memory failed outright, and the claim that it helped was withdrawn. The
+        closed-loop comparisons use eight clips and are underpowered.
+      </p>
+      <div class="rule"></div>
+      <p style="font-size:13.5px">
+        MRes Creative Computing, Creative Computing Institute, University of the Arts London.
+        Supervised by Tim J. Smith. Both corpora are public research datasets used within their
+        terms and are not redistributed.
+      </p>
+    </div>
+    <div>
+      <div class="tw"><table style="margin-top:0">
+        <tr><th>behaviour</th><th style="text-align:right">audience</th><th style="text-align:right">viewer</th></tr>
+        <tr><td>Fixation duration</td><td class="n">179 ms</td><td class="n bad">214–220 ms</td></tr>
+        <tr><td>Saccade amplitude</td><td class="n">1.44°</td><td class="n bad">2.4–4.7°</td></tr>
+        <tr><td>Returns within one degree</td><td class="n">46%</td><td class="n bad">4–24%</td></tr>
+      </table></div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <span>JOY · Artificial Viewer · University of the Arts London</span>
+  <span>
+    <a href="viewer.html">Viewer</a> · <a href="thesis.html">Thesis</a> ·
+    <a href="proposal.html">Proposal</a> · <a href="presentation.html">Presentation</a> ·
+    <a href="https://github.com/iamr7d/enjoy">Paper Hub</a>
+  </span>
+</div></footer>
+
+<script>
+/* The iris fibres follow the same falloff the viewer's percept uses: density and brightness
+   drop with eccentricity, so the picture is the model rather than an impression of one.
+   Drawn synchronously so the page is complete in its first painted frame. */
+(function () {
+  var g = document.getElementById("fibres");
+  if (!g) return;
+  var cx = 270, cy = 310, r0 = 62, r1 = 196, N = 168, out = "";
+  for (var i = 0; i < N; i++) {
+    var a = (i / N) * Math.PI * 2 + (i % 3) * 0.004;
+    var jitter = ((i * 2654435761) % 1000) / 1000;          // deterministic, no Math.random
+    var len = r0 + (r1 - r0) * (0.42 + 0.58 * jitter);
+    var x1 = cx + Math.cos(a) * (r0 + 2), y1 = cy + Math.sin(a) * (r0 + 2);
+    var x2 = cx + Math.cos(a) * len,      y2 = cy + Math.sin(a) * len;
+    var op = (0.30 - 0.20 * (len - r0) / (r1 - r0)).toFixed(3);
+    out += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) +
+           '" y2="' + y2.toFixed(1) + '" stroke-opacity="' + op + '" stroke-width="' +
+           (jitter > 0.72 ? 1.3 : 0.7) + '"/>';
+  }
+  g.innerHTML = out;
+})();
+</script>
+</body>
+</html>

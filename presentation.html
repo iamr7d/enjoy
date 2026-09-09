@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JOY: Artificial Viewer — presentation script</title>
+<style>
+@page { size: A4; margin: 25mm 22mm; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 12pt;
+  line-height: 2.0;                 /* double spaced, as the brief requires */
+  color: #111; background: #fff;
+  max-width: 170mm; margin: 0 auto; padding: 12mm 0 24mm;
+  text-align: left;
+}
+h1, h2, h3, h4 { line-height: 1.35; page-break-after: avoid; break-after: avoid; }
+h1 { font-size: 20pt; margin: 0 0 6pt; }
+h2 { font-size: 15pt; margin: 22pt 0 6pt; border-bottom: 1px solid #ccc; padding-bottom: 3pt; }
+h3 { font-size: 12.5pt; margin: 16pt 0 4pt; }
+h2 + h3 { margin-top: 8pt; }
+p { margin: 0 0 9pt; orphans: 3; widows: 3; }
+blockquote {
+  margin: 10pt 0; padding: 6pt 12pt; border-left: 3px solid #bbb;
+  background: #f7f7f7; line-height: 1.6; page-break-inside: avoid;
+}
+img { max-width: 100%; height: auto; display: block; margin: 10pt auto 4pt; }
+figure, .figure { page-break-inside: avoid; break-inside: avoid; }
+table {
+  border-collapse: collapse; width: 100%; margin: 8pt 0 12pt;
+  font-size: 10.5pt; line-height: 1.35; page-break-inside: avoid; break-inside: avoid;
+}
+th, td { border: 1px solid #bbb; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+th { background: #eee; font-weight: bold; }
+code { font-family: Consolas, "Courier New", monospace; font-size: 10.5pt; background: #f2f2f2;
+       padding: 0 2px; }
+pre { background: #f5f5f5; padding: 8pt; overflow-x: auto; line-height: 1.4; font-size: 10pt;
+      page-break-inside: avoid; }
+ul, ol { margin: 0 0 9pt 18pt; }
+li { margin-bottom: 3pt; }
+hr { border: 0; border-top: 1px solid #ddd; margin: 18pt 0; }
+em { font-style: italic; }
+
+/* Figure captions: the paragraph immediately after an image. */
+p.caption { font-size: 10.5pt; line-height: 1.45; margin: 0 0 14pt; text-align: left; }
+
+/* References get a hanging indent, which is what Harvard expects. */
+#references-body p { text-indent: -12mm; padding-left: 12mm; line-height: 1.6; margin-bottom: 7pt; }
+
+/* Start each numbered chapter on a fresh page in print. */
+@media print {
+  h2.chapter { page-break-before: always; break-before: page; }
+  h2.chapter:first-of-type { page-break-before: auto; break-before: auto; }
+  .noprint { display: none; }
+}
+.noprint {
+  background: #fffbe6; border: 1px solid #e8d98a; padding: 8pt 12pt; margin: 0 0 16pt;
+  font-size: 10.5pt; line-height: 1.5; font-family: Arial, sans-serif;
+}
+</style></head><body>
+<div class="noprint"><b>To produce the submission PDF:</b> print this page (Ctrl+P), choose <i>Save as PDF</i>, set paper to A4, margins to Default, and enable <i>Background graphics</i> so table shading survives. The stylesheet already sets A4 and double line spacing. This yellow box does not print.</div>
+<h1>JOY: Artificial Viewer — presentation script</h1>
+<p>MRes Creative Computing, UAL. Element 3, 20%. Target 13:30 to 14:00, hard limit 15:00.
+Draft, 2026-09-09.</p>
+<p><strong>Rule observed throughout: nothing here is absent from the thesis.</strong> Every figure quoted appears
+in <code>THESIS.md</code>, and the slide numbers below map to the figure list in <code>THESIS_PLAN.md</code> section 4.</p>
+<p>Speaking rate assumed 135 words per minute. Script total is timed to 13:40, leaving margin.</p>
+<hr>
+<h2 class="chapter">Slide 1 — Title (0:00–0:20)</h2>
+<blockquote>
+<p><strong>JOY: Artificial Viewer</strong>
+From gaze prediction to closed-loop computational observation
+MRes Creative Computing, UAL</p>
+</blockquote>
+<p><strong>Say:</strong> This project asks what it takes to build something that watches a film, rather than
+something that predicts where a person watching a film will look. Those turn out to be different
+problems, and the difference is measurable.</p>
+<hr>
+<h2 class="chapter">Slide 2 — Two problems that look like one (0:20–1:40)</h2>
+<blockquote>
+<p>Left: a model is handed a frame a person looked at, and scores how much probability it put where
+they looked.
+Right: a system generates its own fixation, and then sees the world from wherever that fixation
+left it.</p>
+</blockquote>
+<p><strong>Say:</strong> The standard way to evaluate an attention model is prediction. You give it a frame that a
+person actually looked at, it produces a probability map, and you score it against the real
+fixation. Even the best scanpath evaluations work this way: they score each fixation given the
+human's previous scanpath. At every step, the model is handed back the human's trajectory.</p>
+<p>An observer does not get that. It has to choose a fixation, live with the choice, and perceive the
+scene from wherever it ended up. If it chooses badly, the next percept is degraded, and the error
+compounds. A predictor's errors are independent. An observer's errors accumulate.</p>
+<p>The central claim of this thesis is that the distinction is not philosophical. I can show you a
+policy that reliably improves prediction and fails to improve observation, in the same data, with
+the same weights.</p>
+<hr>
+<h2 class="chapter">Slide 3 — Research questions (1:40–2:20)</h2>
+<blockquote>
+<p>RQ1 What does it take, and what constrains it?
+RQ2 What do semantic, bottom-up and oculomotor guidance contribute, and is that state-dependent?
+RQ3 What do limited access and temporal history change?
+RQ4 Can narrative state help without omniscience?</p>
+</blockquote>
+<p><strong>Say:</strong> Four questions. What does it actually take to build an observer that behaves like a human,
+and which components constrain that. What each source of guidance contributes, and whether that
+contribution depends on the viewer's state. What limited perception and history change. And
+whether narrative understanding can contribute without giving the system information no viewer had.</p>
+<p>Each is answerable from the experiments, including where the answer is negative, and several are.</p>
+<hr>
+<h2 class="chapter">Slide 4 — Context (2:20–3:40)</h2>
+<blockquote>
+<p>Central bias survives control of motor and image factors — Tatler 2007
+Gaze in dynamic scenes clusters on motion — Mital et al. 2011
+Fixation duration has its own timing model — Nuthmann et al. 2010
+Meaning versus salience is unresolved — Henderson &amp; Hayes 2017; Pedziwiatr et al. 2021
+Comprehension changes expectation, not location — SPECT, Loschky et al. 2020</p>
+</blockquote>
+<p><strong>Say:</strong> Five things from the literature frame the problem.</p>
+<p>First, most of gaze is not about meaning. The central bias is large and survives controls for both
+motor and image factors. In dynamic scenes, viewers cluster tightly on the same locations, and that
+clustering is predicted by motion. So a semantic cue is never competing in a vacuum.</p>
+<p>Second, where to look and how long to look are separate problems with separate models.</p>
+<p>Third, whether semantic maps really capture meaning is genuinely unresolved. Meaning maps were
+shown not to outperform a saliency model built on semantically neutral high-level features. Any
+project that adds a semantic channel and reports an improvement inherits that ambiguity, including
+this one, and I say so in the thesis.</p>
+<p>Fourth, the theory that covers narrative viewing separates what happens within a fixation from
+event models built across fixations, and holds that comprehension does not tell you where to look.
+It changes what you expect. That is a design constraint I adopted rather than an assumption.</p>
+<hr>
+<h2 class="chapter">Slide 5 — The Artificial Viewer (3:40–5:40) · Figure 1</h2>
+<blockquote>
+<p>frame → foveate at own fixation → percept
+percept → saliency map M, semantic map V
+plus history G from its own past fixations, plus centre bias C
+P = a_M·M + a_G·G + a_C·C + a_V·V
+sample fixation → draw duration → advance clock → repeat</p>
+</blockquote>
+<p><strong>Say:</strong> Here is the loop. The frame is foveated at the viewer's own current fixation, giving a
+percept that is sharp in the middle and degraded towards the edge. Both evidence models run on that
+percept, not on the frame. That matters: a vision-language model asked about a full frame is an
+omniscient observer, with detail no retina delivers. If you do not constrain its input, you have
+quietly given your viewer perfect peripheral vision, and any resemblance to human behaviour becomes
+uninterpretable.</p>
+<p>Two more sources join them. A history term built from the viewer's own previous fixations, not from
+any human's. And a centre bias.</p>
+<p>The four combine as a weighted mixture on the simplex. I chose a mixture rather than a fused network
+for one reason: it keeps every cue's contribution identifiable as a single number, which is what
+makes the whole thesis measurable. Then a fixation is sampled, a duration is drawn, the clock
+advances, and the loop runs again from the new percept.</p>
+<p>No human fixation enters at inference time, and every generated record carries the source of its
+history so that claim can be checked rather than trusted.</p>
+<hr>
+<h2 class="chapter">Slide 6 — Materials and protocol (5:40–7:00)</h2>
+<blockquote>
+<p>75 clips · 73 videos · 4,492 frames · 223 observers · 4.6M fixation samples
+45 validation tests, all passing
+folds at video level · paired bootstrap · per-fold agreement · inner dev split</p>
+</blockquote>
+<p><strong>Say:</strong> The film data is DIEM: 75 clips, 4,492 sampled frames, 223 observers, four and a half
+million identified fixation samples. Every frame has at least eight observers.</p>
+<p>The dataset is checked by 45 named tests covering schema, keys, geometry, normalisation, leakage
+and reproducibility. Two real defects were caught by those tests rather than by inspection: clips
+whose variants had landed in different folds, and semantic regions extending outside the frame.</p>
+<p>On protocol, three commitments, and I will come back to why they matter. Folds are formed at video
+level so variants cannot straddle them. Comparisons are paired and bootstrapped, and every pooled
+interval is reported with how many folds agree in sign. And where a model needs epoch selection,
+that happens on an inner development split, never on the evaluation set.</p>
+<hr>
+<h2 class="chapter">Slide 7 — Experiment 1: the semantic channel (7:00–8:20) · Figure 3b</h2>
+<blockquote>
+<p>per-frame fitted semantic weight: 0.0475
+single global weight fitted for held-out likelihood: <strong>0.000 in four of five folds</strong>
+saliency 0.69 · history 0.30
+oracle headroom over fixed weights: 0.2108 bits</p>
+</blockquote>
+<p><strong>Say:</strong> First result, and it is the one I would lead with.</p>
+<p>Fit the mixture weights per frame and the semantic channel gets about 0.05. Fit a single global
+weight set to maximise held-out likelihood, and the semantic weight is zero in four of five folds.</p>
+<p>Those are consistent, and the reconciliation is the finding. A per-frame fit can put mass on the
+semantic map for the minority of frames where it helps. One global weight cannot, so it puts none.
+The semantic channel is real and local, not absent, and a model forced to commit to one weight does
+better ignoring it.</p>
+<p>Saliency and history take 0.69 and 0.30 between them. And the entire gap between fixed weights and
+a per-frame oracle is 0.21 bits. Hold that number: every semantic and narrative effect in this
+thesis is a fraction of it.</p>
+<hr>
+<h2 class="chapter">Slide 8 — Experiment 2: two senses of state dependence (8:20–9:30) · Figure 5</h2>
+<blockquote>
+<p>predicting the fitted weight: ρ 0.44, ceiling ≈ 0.81 — works
+using the prediction to guide gaze: +0.0094 bits, 5 of 5 folds — reliable, 5% of headroom
+eight-feature policy: <strong>worse than fixed on three of five folds</strong></p>
+</blockquote>
+<p><strong>Say:</strong> If the semantic weight varies frame to frame, it should vary with something observable. It
+does. State features predict the fitted weight at a correlation of 0.44, against a reliability
+ceiling of about 0.81, so they explain a little under half of the reliable variation. That is a real
+finding about when semantic guidance matters.</p>
+<p>Now use that prediction to actually weight the gaze model. The gain is 0.0094 bits. Reliable, five
+folds out of five, and about five per cent of the available headroom.</p>
+<p>And give the policy more freedom, eight features instead of five, and it becomes worse than fixed
+weights on three of five folds.</p>
+<p>So predicting a fitted latent parameter is not the same as improving the behaviour that parameter
+was fitted to describe. That is the clearest methodological lesson in the project.</p>
+<hr>
+<h2 class="chapter">Slide 9 — The dissociation (9:30–11:00) · Figure 3, centrepiece</h2>
+<blockquote>
+<p>Same policy, two evaluations
+frame level, 4,088 frames: <strong>+0.0099 bits, positive in 5 of 5 folds</strong>
+closed loop, 8 clips: mean +0.391, <strong>median −0.919</strong>, wins <strong>3 of 8 clips</strong>
+<em>prediction is evaluated on the human trajectory; observation must survive its own</em></p>
+</blockquote>
+<p><strong>Say:</strong> This is the centre of the thesis.</p>
+<p>Take the best arbitration policy. Evaluated as a predictor, on frames the audience actually
+fixated, it beats fixed weights by 0.0099 bits, positive in all five folds. Reliable.</p>
+<p>Now put the same policy in charge of the loop, generating its own scanpath and updating its own
+state. Its mean advantage is positive, at 0.391, but its median is minus 0.919, and it wins on
+three of eight clips. The mean rests on two clips. When mean and median disagree in sign, the
+average is being carried by outliers.</p>
+<p>So a model got better at predicting where people looked, and did not get better at looking. The
+mechanism is the one on the slide. A predictor is scored on the human trajectory and is never asked
+to survive its own errors. An observer is.</p>
+<p>One honest caveat, which is in the thesis. The two evaluations differ in power as well as in kind:
+4,088 frames and 75 clips against 8 clips. The dissociation is also consistent with a real but small
+benefit that the closed-loop design is too weak to detect. What cannot be said is that the closed
+loop confirms the frame-level result.</p>
+<hr>
+<h2 class="chapter">Slide 10 — Experiment 5 and the behavioural gap (11:00–12:20) · Figures 8, 10</h2>
+<blockquote>
+<p>story state: +0.0041 bits · shuffle its time: −0.0153 · take it from another clip: −0.0214
+load-bearing part is event boundary; object identity contributes nothing detectable
+humans 179 ms · 1.44° · 46% return
+viewer 214–220 ms · 2.4–4.7° · 4–24% return</p>
+</blockquote>
+<p><strong>Say:</strong> Briefly on narrative, then the finding that matters most.</p>
+<p>A story state, computed only from the viewer's own prior outputs and audited to contain no future
+information, adds 0.0041 bits. Small. But shuffle its timing and you lose three times that; take it
+from a different clip and you lose five times that. Both shuffles fall below having no story state
+at all, in all five folds. A signal that loses more when disturbed than it gains by being present is
+doing temporal work. And the load-bearing part is event boundary structure. Object identity
+contributes nothing detectable.</p>
+<p>Now the behavioural comparison. The audience made fixations of 179 milliseconds, saccades of 1.44
+degrees, and returned to a recently fixated spot 46 per cent of the time. Every rule I tested
+produced fixations of 214 to 220 milliseconds, saccades of 2.4 to 4.7 degrees, and return rates of
+4 to 24 per cent.</p>
+<p>That gap is in timing, amplitude and persistence. No semantic or narrative mechanism in this thesis
+touches any of them, and all of them are far larger than every effect I have shown you.</p>
+<hr>
+<h2 class="chapter">Slide 11 — Contribution and limitations (12:20–13:20)</h2>
+<blockquote>
+<ol>
+<li>an empirical dissociation between prediction and observation</li>
+<li>semantic guidance quantified: real, local, zero under a global weight</li>
+<li>a causally audited narrative state that never names a location</li>
+<li>three protocol failures, each of which reversed a result here
+limits: 8 clips underpowered · video saliency model on stills · observers not held out · baseline
+not comparable to published information gain</li>
+</ol>
+</blockquote>
+<p><strong>Say:</strong> Four contributions.</p>
+<p>The dissociation. A quantified account of the semantic channel, including that a global weight sets
+it to zero. A narrative state that is causally audited and influences gaze only through arbitration,
+never by naming a location. And a methodological one: three protocol decisions each reversed a
+result in this project. Selecting the epoch on the evaluation set moved the same comparison from
+minus 0.094 to plus 0.103, nearly two tenths of a bit, which is further than the effect being
+measured. A pooled interval without fold agreement supported a claim living
+entirely in one fold. A mean over eight clips without the median made the leading rule one that
+loses on most of them. And a training-size sweep showed the state-dependent rung loses to fixed
+below about three thousand examples and beats it above, monotonically, so a negative measured
+below that size is a statement about the training set and not the mechanism.</p>
+<p>The first three inflate the more flexible model. The fourth deflates it. Between them, an
+evaluation of adaptive against fixed can be made to come out either way without touching the
+mechanism at all.</p>
+<p>Limitations. The closed loop uses eight clips and is underpowered. The bottom-up model is a video
+model, and one study applies it to stills where its motion pathway is inert. Observers are not held
+out. And my metric is bits above uniform, not the benchmark convention of information gain above a
+centre bias, so my numbers are not directly comparable with published ones.</p>
+<hr>
+<h2 class="chapter">Slide 12 — Conclusion (13:20–13:40)</h2>
+<blockquote>
+<p>Human-like artificial viewing is not reducible to better semantic gaze prediction.
+The binding constraints are perceptual access, temporal continuity and motor dynamics.</p>
+</blockquote>
+<p><strong>Say:</strong> I did not build a human-like observer. What I built was an instrument that shows where the
+attempt succeeds and where it fails, and the failures are informative. Each time I added semantic or
+narrative sophistication it returned less than the last, while the largest gap sat somewhere none of
+it touched.</p>
+<p>So: human-like artificial viewing is not reducible to better semantic gaze prediction. The binding
+constraints are perceptual access, temporal continuity and motor dynamics. That is what the next
+programme addresses.</p>
+<p>Thank you.</p>
+<hr>
+<h2>Anticipated questions</h2>
+<p><strong>Are you saying adaptive arbitration is impossible?</strong>
+No. The experiments show that the particular state-dependent formulations evaluated here provide
+limited benefit at low capacity, and that this benefit does not survive increased model freedom,
+autonomous closed-loop deployment, or transfer to task-directed search. The results constrain the
+hypothesis rather than falsify the general possibility.</p>
+<p><strong>Isn't 0.004 bits too small to mean anything?</strong>
+It is statistically resolved and behaviourally negligible, and the thesis reports those as separate
+things. The point of quoting the 0.21 bit oracle headroom is to make the scale visible.</p>
+<p><strong>Why is the semantic weight zero in one place and 0.08 in another?</strong>
+They are different estimators. Per-frame fits, a single global fit, and an earlier population fit on
+eight held-out clips give 0.0475, 0.000 and 0.084 respectively. The thesis names the estimator
+every time it quotes a number, and the disagreement between them is a result rather than an
+inconsistency.</p>
+<p><strong>Could the semantic map just be high-level image structure?</strong>
+Possibly, and that is unresolved in the literature too. The test that would settle it is
+substituting a high-level saliency model for the semantic map and refitting. It is scoped and not
+run, and it is an early component of the proposed programme.</p>
+<hr>
+<h2>Recording notes</h2>
+<ul>
+<li>Panopto or equivalent; content beyond 15:00 is not marked, so the target is 13:40.</li>
+<li>Figures 1, 3, 3b, 5, 8 and 10 from the thesis figure list are the only visuals needed.</li>
+<li>Slide 9 is the one to rehearse. It carries the argument and it has a caveat that must not be
+  dropped for time.</li>
+</ul>
+</body></html>

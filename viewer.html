@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Running the viewer — JOY</title>
+<style>
+body{margin:0;background:#08090b;color:#f2f4f7;font:300 15px/1.7 "IBM Plex Sans",system-ui,sans-serif}
+.w{max-width:720px;margin:0 auto;padding:80px 26px}
+a{color:#e8a33c;text-decoration:none;border-bottom:1px solid rgba(232,163,60,.35)}
+h1{font-size:31px;font-weight:300;letter-spacing:-.4px;margin:0 0 18px}
+p{color:#a8b0ba;margin:0 0 16px}
+pre{background:#101318;border:1px solid #1e232b;border-radius:5px;padding:15px 17px;
+    overflow-x:auto;font-family:"IBM Plex Mono",Consolas,monospace;font-size:13px;color:#a8b0ba}
+.k{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#535c67;margin:0 0 22px}
+</style></head><body><div class="w">
+<p class="k">The live viewer</p>
+<h1>It runs locally, not here</h1>
+<p>
+  The viewer is an interactive application, not a page. It decodes film, foveates each frame at
+  its own current fixation, runs a saliency model and a vision-language model on that percept,
+  and samples its next fixation. That needs a Python server, a GPU for the two models, and
+  roughly 700 MB of video and mesh assets, so it is not something a static site can host and not
+  something that belongs in a repository.
+</p>
+<p>To run it from the full project:</p>
+<pre>python paper-hub/server.py
+# then open http://127.0.0.1:8077/viewer</pre>
+<p>
+  Everything the viewer produced is on this site already: the figures are generated from its
+  stored outputs, and the three documents report what it did.
+  <a href="index.html">Back to the project</a>.
+</p>
+</div></body></html>
