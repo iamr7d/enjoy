@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>JOY — Artificial Viewer</title>
+<link rel="icon" type="image/png" href="favicon-joy.png">
 <meta name="description" content="A closed-loop artificial observer that watches film through a foveated percept, and the dissociation between predicting gaze and producing it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,7 +42,9 @@ nav{
   backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
 }
 nav .wrap{display:flex; align-items:center; gap:26px; height:66px}
-.mark{font-size:19px; letter-spacing:.42em; font-weight:300; white-space:nowrap}
+/* The mark is white ink with its own glow, converted to alpha, so it drops onto any ground
+   without a black plate behind it. */
+.mark{height:23px; width:auto; display:block; flex:none}
 .mark-sub{font-size:10px; letter-spacing:.26em; color:var(--dim); text-transform:uppercase; white-space:nowrap}
 nav .links{display:flex; gap:26px; margin:0 auto}
 nav .links a{
@@ -60,10 +63,11 @@ nav .links a:hover,nav .links a.on{color:var(--white); border-bottom-color:var(-
 .hero{position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
 .hero .wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);
             gap:50px; align-items:center; padding-top:64px; padding-bottom:34px}
-.word{font-size:clamp(52px,8.4vw,104px); letter-spacing:.16em; font-weight:200;
-      line-height:1; margin:0 0 14px}
-.word-sub{font-size:clamp(11px,1.5vw,15px); letter-spacing:.5em; color:var(--grey);
-          font-weight:300; margin:0 0 34px; text-transform:uppercase}
+.word{width:min(322px,66%); height:auto; display:block; margin:-16px 0 -6px -30px}
+/* Sized and offset to the INK, not the bitmap: the glow adds roughly a fifth of the height and
+   a tenth of the width as transparent margin, which otherwise reads as stray padding. */
+.word-sub{font-size:clamp(11px,1.5vw,14px); letter-spacing:.46em; color:var(--grey);
+          font-weight:300; margin:0 0 30px; text-transform:uppercase; padding-left:3px}
 h1{font-size:clamp(21px,2.7vw,31px); line-height:1.28; font-weight:300; margin:0 0 20px;
    letter-spacing:-.2px; max-width:19ch}
 .hero .lede{color:var(--grey); max-width:46ch; margin:0 0 30px; font-size:15px; font-weight:300}
@@ -180,7 +184,7 @@ footer a:hover{color:var(--white)}
 <body>
 
 <nav><div class="wrap">
-  <span class="mark">JOY</span>
+  <img class="mark" src="logo-joy-web.png" alt="JOY">
   <span class="mark-sub">Artificial Viewer</span>
   <span class="links">
     <a class="on" href="#top">Home</a>
@@ -194,7 +198,7 @@ footer a:hover{color:var(--white)}
 
 <header class="hero" id="top"><div class="wrap">
   <div>
-    <p class="word">J O Y</p>
+    <img class="word" src="logo-joy-web.png" alt="JOY">
     <p class="word-sub">Artificial Viewer</p>
     <h1>From gaze prediction to closed-loop computational observation</h1>
     <p class="lede">
