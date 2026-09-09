@@ -63,11 +63,8 @@ nav .links a:hover,nav .links a.on{color:var(--white); border-bottom-color:var(-
 .hero{position:relative; overflow:hidden; border-bottom:1px solid var(--line)}
 .hero .wrap{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);
             gap:50px; align-items:center; padding-top:64px; padding-bottom:34px}
-.word{width:min(322px,66%); height:auto; display:block; margin:-16px 0 -6px -30px}
-/* Sized and offset to the INK, not the bitmap: the glow adds roughly a fifth of the height and
-   a tenth of the width as transparent margin, which otherwise reads as stray padding. */
-.word-sub{font-size:clamp(11px,1.5vw,14px); letter-spacing:.46em; color:var(--grey);
-          font-weight:300; margin:0 0 30px; text-transform:uppercase; padding-left:3px}
+.word-sub{font-size:11px; letter-spacing:.3em; color:var(--faint); font-weight:400;
+          margin:0 0 22px; text-transform:uppercase}
 h1{font-size:clamp(21px,2.7vw,31px); line-height:1.28; font-weight:300; margin:0 0 20px;
    letter-spacing:-.2px; max-width:19ch}
 .hero .lede{color:var(--grey); max-width:46ch; margin:0 0 30px; font-size:15px; font-weight:300}
@@ -198,7 +195,6 @@ footer a:hover{color:var(--white)}
 
 <header class="hero" id="top"><div class="wrap">
   <div>
-    <img class="word" src="logo-joy-web.png" alt="JOY">
     <p class="word-sub">Artificial Viewer</p>
     <h1>From gaze prediction to closed-loop computational observation</h1>
     <p class="lede">
