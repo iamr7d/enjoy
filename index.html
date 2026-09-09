@@ -9,9 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@200;300;400;500;600&display=swap">
 <style>
-/* Dark, cinematic, instrument-like. Every visual on this page is generated from the project's
-   own data or drawn from its own equations: the iris is the acuity falloff the viewer actually
-   uses, and the layered stack is one real frame through the four real stages. Nothing is stock.
+/* Dark, cinematic, instrument-like. The hero photograph is a supplied, generated image and is
+   credited as such; everything overlaid on it, and every other visual on the page, comes from
+   the project's own data or equations. The rings are the acuity falloff the viewer actually
+   uses, and the layered stack is one real frame through the four real stages.
    Amber is the eye and is the only chroma; everything else is light on black. */
 :root{
   --black:#08090b; --deep:#0b0d10; --panel:#101318; --line:#1e232b; --line-2:#2a313b;
@@ -83,12 +84,23 @@ h1{font-size:clamp(21px,2.7vw,31px); line-height:1.28; font-weight:300; margin:0
 .closer{position:absolute; right:40px; bottom:26px; text-align:right; font-size:9.5px;
         letter-spacing:.24em; text-transform:uppercase; color:var(--faint); line-height:1.7}
 
-/* the iris */
+/* the eye: a supplied generated image, with the model's own acuity rings drawn over it.
+   The image is illustration; everything on top of it is the model. */
 .iris-holder{position:relative}
-.iris-holder svg{width:100%; height:auto; display:block}
-.ann{font-family:var(--sans); font-size:10.5px; letter-spacing:.22em; fill:var(--grey);
-     text-transform:uppercase}
-.ann-num{font-family:var(--mono); font-size:8.5px; fill:var(--faint); letter-spacing:.06em}
+.eye{position:relative; isolation:isolate}
+.eye img{
+  width:100%; height:auto; display:block;
+  /* feather every edge into the page so the photograph sits in the dark rather than on it */
+  -webkit-mask-image:radial-gradient(66% 74% at 52% 49%, #000 24%, rgba(0,0,0,.5) 56%, transparent 76%);
+  mask-image:radial-gradient(66% 74% at 52% 49%, #000 24%, rgba(0,0,0,.5) 56%, transparent 76%);
+}
+.eye .ov{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+.ann{font-family:var(--sans); font-size:11px; letter-spacing:.22em; fill:var(--white);
+     text-transform:uppercase; paint-order:stroke; stroke:#08090b; stroke-width:3px;
+     stroke-opacity:.55}
+.ann-num{font-family:var(--mono); font-size:9.5px; fill:#e8a33c; fill-opacity:.95;
+         letter-spacing:.06em; paint-order:stroke; stroke:#08090b; stroke-width:3px;
+         stroke-opacity:.6}
 
 /* ---------------- sections ---------------- */
 section{padding:88px 0; border-bottom:1px solid var(--line)}
@@ -203,56 +215,38 @@ footer a:hover{color:var(--white)}
   </div>
 
   <div class="iris-holder">
-    <!-- The iris is the acuity function the viewer actually uses: rings at 1, 5, 10 and 20
-         degrees of eccentricity, fibres whose length and brightness fall off with the same
-         curve. It is a diagram of the instrument, not a photograph of an eye. -->
-    <svg viewBox="0 0 620 620" role="img" aria-label="Acuity falloff with eccentricity, annotated with the four stages of the loop">
-      <defs>
-        <radialGradient id="ir" cx="50%" cy="50%" r="50%">
-          <stop offset="18%" stop-color="#05070a"/>
-          <stop offset="42%" stop-color="#1a2432"/>
-          <stop offset="72%" stop-color="#2c3a4b"/>
-          <stop offset="100%" stop-color="#0a0d12"/>
-        </radialGradient>
-        <radialGradient id="gl" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#e8a33c" stop-opacity=".30"/>
-          <stop offset="55%" stop-color="#e8a33c" stop-opacity=".05"/>
-          <stop offset="100%" stop-color="#e8a33c" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <circle cx="270" cy="310" r="238" fill="url(#gl)"/>
-      <circle cx="270" cy="310" r="196" fill="url(#ir)"/>
-      <g id="fibres" stroke="#7f9bb8" fill="none"></g>
-      <circle cx="270" cy="310" r="196" fill="none" stroke="#3b4a5c" stroke-width="1"/>
-      <circle cx="270" cy="310" r="62" fill="#04060a"/>
-      <circle cx="270" cy="310" r="62" fill="none" stroke="#e8a33c" stroke-opacity=".35" stroke-width="1"/>
-      <!-- eccentricity rings -->
-      <g fill="none" stroke="#e8a33c" stroke-opacity=".22" stroke-dasharray="2 5">
-        <circle cx="270" cy="310" r="96"/><circle cx="270" cy="310" r="136"/>
-        <circle cx="270" cy="310" r="176"/>
-      </g>
-      <g class="ann-num" text-anchor="middle">
-        <text x="270" y="208">5°</text><text x="270" y="168">10°</text><text x="270" y="128">20°</text>
-      </g>
-      <!-- fixation cross -->
-      <g stroke="#e8a33c" stroke-width="1.2">
-        <line x1="238" y1="310" x2="258" y2="310"/><line x1="282" y1="310" x2="302" y2="310"/>
-        <line x1="270" y1="278" x2="270" y2="298"/><line x1="270" y1="322" x2="270" y2="342"/>
-      </g>
-      <!-- the loop, annotated outward -->
-      <g stroke="#3b4a5c" stroke-width="1">
-        <path d="M420 150 H556"/><path d="M452 250 H556"/>
-        <path d="M452 370 H556"/><path d="M420 470 H556"/>
-      </g>
-      <g fill="#e8a33c">
-        <circle cx="420" cy="150" r="3"/><circle cx="452" cy="250" r="3"/>
-        <circle cx="452" cy="370" r="3"/><circle cx="420" cy="470" r="3"/>
-      </g>
-      <g class="ann">
-        <text x="566" y="154">Perceive</text><text x="566" y="254">Select</text>
-        <text x="566" y="374">Move</text><text x="566" y="474">Learn</text>
-      </g>
-    </svg>
+    <div class="eye">
+      <img src="eye-hero.jpg" alt="A generated macro image of an iris, overlaid with the viewer's own acuity rings and the four stages of its loop">
+      <!-- Everything drawn here is the model, not the picture: rings at 5, 10 and 20 degrees of
+           eccentricity from the fixation, and the four stages the loop actually runs. -->
+      <svg class="ov" viewBox="0 0 1000 563" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <g fill="none" stroke="#e8a33c" stroke-opacity=".8" stroke-width="1.7" stroke-dasharray="3 6">
+          <circle cx="514" cy="275" r="96"/><circle cx="514" cy="275" r="138"/>
+          <circle cx="514" cy="275" r="182"/>
+        </g>
+        <g class="ann-num" text-anchor="middle">
+          <text x="514" y="172">5°</text>
+          <text x="514" y="130">10°</text>
+          <text x="514" y="86">20°</text>
+        </g>
+        <g stroke="#e8a33c" stroke-width="2.1" stroke-opacity=".95">
+          <line x1="474" y1="275" x2="497" y2="275"/><line x1="531" y1="275" x2="554" y2="275"/>
+          <line x1="514" y1="235" x2="514" y2="258"/><line x1="514" y1="292" x2="514" y2="315"/>
+        </g>
+        <g stroke="#ffffff" stroke-opacity=".6" stroke-width="1.5">
+          <path d="M700 96 H812"/><path d="M726 214 H812"/>
+          <path d="M726 336 H812"/><path d="M700 454 H812"/>
+        </g>
+        <g fill="#e8a33c">
+          <circle cx="700" cy="96" r="3.4"/><circle cx="726" cy="214" r="3.4"/>
+          <circle cx="726" cy="336" r="3.4"/><circle cx="700" cy="454" r="3.4"/>
+        </g>
+        <g class="ann">
+          <text x="822" y="100">Perceive</text><text x="822" y="218">Select</text>
+          <text x="822" y="340">Move</text><text x="822" y="458">Learn</text>
+        </g>
+      </svg>
+    </div>
   </div>
 </div>
 <p class="closer">A closer look<br>at looking</p>
@@ -441,27 +435,5 @@ footer a:hover{color:var(--white)}
   </span>
 </div></footer>
 
-<script>
-/* The iris fibres follow the same falloff the viewer's percept uses: density and brightness
-   drop with eccentricity, so the picture is the model rather than an impression of one.
-   Drawn synchronously so the page is complete in its first painted frame. */
-(function () {
-  var g = document.getElementById("fibres");
-  if (!g) return;
-  var cx = 270, cy = 310, r0 = 62, r1 = 196, N = 168, out = "";
-  for (var i = 0; i < N; i++) {
-    var a = (i / N) * Math.PI * 2 + (i % 3) * 0.004;
-    var jitter = ((i * 2654435761) % 1000) / 1000;          // deterministic, no Math.random
-    var len = r0 + (r1 - r0) * (0.42 + 0.58 * jitter);
-    var x1 = cx + Math.cos(a) * (r0 + 2), y1 = cy + Math.sin(a) * (r0 + 2);
-    var x2 = cx + Math.cos(a) * len,      y2 = cy + Math.sin(a) * len;
-    var op = (0.30 - 0.20 * (len - r0) / (r1 - r0)).toFixed(3);
-    out += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) +
-           '" y2="' + y2.toFixed(1) + '" stroke-opacity="' + op + '" stroke-width="' +
-           (jitter > 0.72 ? 1.3 : 0.7) + '"/>';
-  }
-  g.innerHTML = out;
-})();
-</script>
 </body>
 </html>

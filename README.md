@@ -24,6 +24,8 @@ This is the **demo site only**. It is static and self-contained.
 | `proposal.html` | the PhD proposal |
 | `presentation.html` | the presentation script |
 | `figures/` | figures, each generated from a stored result file |
+| `hero_stack.png` | one Sintel frame through the viewer's four stages |
+| `eye-hero.jpg` | header illustration, generated, credited in CREDITS.md |
 | `viewer.html` | how to run the interactive viewer locally |
 
 No research code, datasets or model weights are included. The interactive viewer is not hosted

@@ -1,5 +1,12 @@
 # Credits, licensing and what is withheld
 
+## The eye on the project page
+
+The macro iris image in the header is a **generated image supplied by the author**, used as
+illustration. It is not a photograph of a real eye, not data, and not an output of this project.
+Everything drawn on top of it is: the dashed rings are the viewer's own acuity falloff at 5, 10
+and 20 degrees of eccentricity, and the four labels are the stages its loop actually runs.
+
 ## Film material
 
 The hero image on the project page is generated from **Sintel** (2010), the Blender Foundation
